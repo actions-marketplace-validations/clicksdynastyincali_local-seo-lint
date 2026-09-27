@@ -1,0 +1,40 @@
+name: 'Local SEO Lint'
+description: 'Catch local SEO mistakes in static sites: NAP consistency, schema vs. page, canonicals, sitemap, orphan pages and keyword overlap.'
+author: 'Clicks Dynasty'
+branding:
+  icon: 'map-pin'
+  color: 'green'
+inputs:
+  path:
+    description: 'Folder containing your built HTML site'
+    required: false
+    default: '.'
+  config:
+    description: 'Path to a config file (default: .localseorc.json inside the folder)'
+    required: false
+    default: ''
+  ignore:
+    description: 'Comma-separated globs to skip, e.g. "drafts/**,backup/**"'
+    required: false
+    default: ''
+  max-warnings:
+    description: 'Fail the job if there are more warnings than this (leave empty for no limit)'
+    required: false
+    default: ''
+runs:
+  using: 'composite'
+  steps:
+    - name: Run local-seo-lint
+      shell: bash
+      env:
+        LSL_PATH: ${{ inputs.path }}
+        LSL_CONFIG: ${{ inputs.config }}
+        LSL_IGNORE: ${{ inputs.ignore }}
+        LSL_MAXW: ${{ inputs.max-warnings }}
+      run: |
+        args=("$LSL_PATH" --format github --limit 0)
+        [ -n "$LSL_CONFIG" ] && args+=(--config "$LSL_CONFIG")
+        [ -n "$LSL_MAXW" ] && args+=(--max-warnings "$LSL_MAXW")
+        IFS=',' read -ra globs <<< "$LSL_IGNORE"
+        for g in "${globs[@]}"; do g="$(echo "$g" | xargs)"; [ -n "$g" ] && args+=(--ignore "$g"); done
+        node "${{ github.action_path }}/bin/local-seo-lint.js" "${args[@]}"

@@ -1,0 +1,17 @@
+# Save as .github/workflows/local-seo-lint.yml in your website repository.
+name: Local SEO Lint
+on:
+  push:
+  pull_request:
+jobs:
+  lint:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+      - uses: clicksdynastyincali/local-seo-lint@main
+        with:
+          path: .            # or your build output folder, e.g. public/ or dist/
+          ignore: "drafts/**"
