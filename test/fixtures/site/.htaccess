@@ -1,1 +1,2 @@
-
+RewriteEngine On
+   RewriteRule ^old-page\.html$ /services.html [R=301,L]
