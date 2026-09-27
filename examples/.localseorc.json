@@ -1,0 +1,14 @@
+{
+  "siteUrl": "https://www.example.com",
+  "business": {
+    "name": "Oak Street Plumbing",
+    "phone": "+1-661-555-0123",
+    "address": { "street": "123 Example Ave, Suite 4", "postalCode": "93301" }
+  },
+  "ignore": ["drafts/**", "backup/**"],
+  "overlap": { "threshold": 0.8 },
+  "rules": {
+    "description-duplicate": "off",
+    "orphan-page": "error"
+  }
+}
