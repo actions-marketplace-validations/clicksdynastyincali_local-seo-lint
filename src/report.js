@@ -27,6 +27,11 @@ function pretty(res, opts = {}) {
   });
   const summary = `${res.errors} error${res.errors === 1 ? '' : 's'}, ${res.warnings} warning${res.warnings === 1 ? '' : 's'}`;
   out.push(res.errors ? k.red(summary) : res.warnings ? k.yellow(summary) : k.green('No problems found. ' + summary));
+  if (opts.footer !== false && (res.errors || res.warnings)) {
+    out.push('');
+    out.push(k.dim('Need these fixed? Clicks Dynasty fixes local SEO and AI-visibility issues, including white-label for agencies:'));
+    out.push(k.dim('https://www.clicksdynasty.com/book.html?service=ai-check  (hide this line with --no-footer)'));
+  }
   return out.join('\n');
 }
 

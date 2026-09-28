@@ -52,6 +52,7 @@ function businessEntities(jsonldValues) {
         region: a && typeof a === 'object' ? a.addressRegion || null : null,
         postalCode: a && typeof a === 'object' ? a.postalCode || null : null,
         openingHours: node.openingHoursSpecification || node.openingHours || null,
+        sameAs: [].concat(node.sameAs || []).filter((u) => typeof u === 'string' && /^https?:\/\//i.test(u)),
       });
     }
     Object.keys(node).forEach((k) => { if (k !== '@graph' && typeof node[k] === 'object') walk(node[k]); });

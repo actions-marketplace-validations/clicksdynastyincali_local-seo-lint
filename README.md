@@ -1,6 +1,6 @@
 # local-seo-lint
 
-**Catch local SEO mistakes before they go live.**
+**Catch local SEO and AI-search mistakes before they go live.**
 
 `local-seo-lint` scans a static website folder and flags the problems that quietly hurt local rankings: a phone number that's different on one page, schema that disagrees with the page, two pages fighting for the same search, pages Google can't find, and more.
 
@@ -109,6 +109,8 @@ This is the output for the small demo site in [`test/fixtures/site`](test/fixtur
 | `title-missing` / `title-duplicate` | error / warn | Missing or repeated `<title>` |
 | `description-missing` / `description-duplicate` | warn | Missing or repeated meta description |
 | `h1-missing` | warn | Page has no `<h1>` |
+| `ai-crawler-blocked` | error | `robots.txt` blocks an AI search crawler (OAI-SearchBot, ChatGPT-User, PerplexityBot, Claude-SearchBot, Bingbot, Applebot), so the business can't appear in AI answers |
+| `ai-entity-links-missing` | warn | Homepage business schema has no `sameAs` links (Google Business Profile, Facebook, LinkedIn, Yelp), so AI tools can't confirm which business it is |
 
 Pages marked `noindex`, `404.html`, and pages that are 301-redirected in `.htaccess` or `_redirects` are skipped where it makes sense.
 
@@ -160,6 +162,7 @@ Options:
   --limit <n>            Max findings shown per rule in pretty output (0 = all, default 10)
   --max-warnings <n>     Fail if there are more than n warnings (default: no limit)
   --no-color             Disable colors
+  --no-footer            Hide the "need help?" line under the results
   -h, --help             Show this help
   -v, --version          Show version
 
@@ -192,6 +195,13 @@ jobs:
 
 Problems appear as annotations on the changed files in pull requests, and errors fail the check.
 
+### AI search checks
+
+More customers now ask ChatGPT and Perplexity to recommend local businesses. In our [California AI Visibility Index](https://www.clicksdynasty.com/california-ai-visibility-index.html), the two tools agreed on only about 1 in 4 of the businesses they recommended. Two things on your own site decide whether you can show up at all:
+
+- **Crawler access.** If `robots.txt` blocks the crawlers that fetch pages for AI answers, those tools can't read your site. Blocking *training* crawlers such as `GPTBot` or `ClaudeBot` is your choice and is not flagged.
+- **Entity links.** `sameAs` links in your business schema tie your website to your Google, Yelp and social profiles, which is how AI tools check they have the right business.
+
 ## Limitations
 
 - Built for static HTML. It does not run JavaScript, so content injected client-side isn't seen.
@@ -207,6 +217,10 @@ Problems appear as annotations on the changed files in pull requests, and errors
 - International phone formats
 
 Issues and pull requests are welcome.
+
+## For agencies
+
+Running this on client sites and finding more than your team has time to fix? [Clicks Dynasty](https://www.clicksdynasty.com) fixes local SEO and AI-visibility issues white-label, under your brand, and never contacts your clients. [Book a free call](https://www.clicksdynasty.com/book.html?service=strategy).
 
 ## Development
 

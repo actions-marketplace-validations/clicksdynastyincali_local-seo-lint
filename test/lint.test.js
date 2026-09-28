@@ -47,3 +47,16 @@ test('helpers', () => {
   assert.ok(!globToRe('*.html').test('a/b.html'));
 });
 test('exit status data', () => { assert.ok(res.errors > 0); assert.ok(res.warnings > 0); });
+test('AI search crawler blocked in robots.txt (training-only bots are not flagged)', () => {
+  const f = res.findings.find((x) => x.rule === 'ai-crawler-blocked');
+  assert.ok(f && /PerplexityBot/.test(f.message));
+  assert.ok(!/GPTBot/.test(f.message));
+});
+test('business schema without sameAs links', () => assert.ok(has('ai-entity-links-missing', 'index.html')));
+test('robots.txt reader', () => {
+  const { robotsBlocksRoot } = require('../src/checks');
+  assert.ok(robotsBlocksRoot('User-agent: *\nDisallow: /', 'OAI-SearchBot'));
+  assert.ok(!robotsBlocksRoot('User-agent: *\nDisallow: /\n\nUser-agent: OAI-SearchBot\nAllow: /', 'OAI-SearchBot'));
+  assert.ok(!robotsBlocksRoot('User-agent: *\nDisallow: /admin/', 'PerplexityBot'));
+  assert.ok(robotsBlocksRoot('User-agent: GPTBot\nUser-agent: PerplexityBot\nDisallow: /', 'PerplexityBot'));
+});

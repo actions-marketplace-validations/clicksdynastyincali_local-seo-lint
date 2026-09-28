@@ -26,7 +26,33 @@ const RULES = {
   'description-duplicate': { severity: 'warn', about: 'Several pages share the same meta description.' },
   'h1-missing': { severity: 'warn', about: 'Page has no <h1>.' },
   'keyword-overlap': { severity: 'warn', about: 'Two pages target nearly the same search, so they compete with each other.' },
+  'ai-crawler-blocked': { severity: 'error', about: 'robots.txt blocks an AI search crawler, so ChatGPT, Perplexity or Claude cannot read or recommend the site.' },
+  'ai-entity-links-missing': { severity: 'warn', about: 'Business schema has no sameAs profile links, so AI tools cannot confirm which business this is.' },
 };
+
+// Crawlers that fetch pages for AI search answers (not model training). Blocking these hides a business from AI recommendations.
+const AI_SEARCH_BOTS = ['OAI-SearchBot', 'ChatGPT-User', 'PerplexityBot', 'Perplexity-User', 'Claude-SearchBot', 'Claude-User', 'Bingbot', 'Applebot'];
+
+// Minimal robots.txt reader: returns true if `agent` may not fetch "/".
+function robotsBlocksRoot(txt, agent) {
+  const groups = []; let cur = null, lastWasAgent = false;
+  txt.split(/\r?\n/).forEach((raw) => {
+    const line = raw.replace(/#.*/, '').trim();
+    const m = line.match(/^([A-Za-z-]+)\s*:\s*(.*)$/);
+    if (!m) return;
+    const key = m[1].toLowerCase(), val = m[2].trim();
+    if (key === 'user-agent') { if (!lastWasAgent) { cur = { agents: [], rules: [] }; groups.push(cur); } cur.agents.push(val.toLowerCase()); lastWasAgent = true; return; }
+    lastWasAgent = false;
+    if (cur && (key === 'allow' || key === 'disallow')) cur.rules.push({ allow: key === 'allow', path: val });
+  });
+  const a = agent.toLowerCase();
+  let rules = groups.filter((g) => g.agents.includes(a)).flatMap((g) => g.rules);
+  if (!groups.some((g) => g.agents.includes(a))) rules = groups.filter((g) => g.agents.includes('*')).flatMap((g) => g.rules);
+  const hits = rules.filter((r) => r.path && '/'.startsWith(r.path.replace(/\*$/, '').replace(/\$$/, '')));
+  if (!hits.length) return false;
+  const best = hits.reduce((x, y) => (y.path.length > x.path.length || (y.path.length === x.path.length && y.allow) ? y : x));
+  return !best.allow;
+}
 
 const STOP = new Set('a an and or the of in on for to with by at from your our you we is are be as it this that best top free near me vs & | - – — : , ca usa us'.split(' '));
 
@@ -207,6 +233,18 @@ function run(site, cfg = {}) {
     }
   });
 
+  // AI search readiness
+  const robotsFile = require('path').join(site.root, 'robots.txt');
+  if (fs.existsSync(robotsFile)) {
+    const txt = fs.readFileSync(robotsFile, 'utf8');
+    const blocked = AI_SEARCH_BOTS.filter((b) => robotsBlocksRoot(txt, b));
+    if (blocked.length) add('ai-crawler-blocked', 'robots.txt', `Blocks ${blocked.join(', ')}. Add "User-agent: ${blocked[0]}" with "Allow: /" if you want to appear in AI answers.`);
+  }
+  if (home && business && business.source !== 'config') {
+    const ents = businessEntities(home.jsonldParsed).filter((e) => normName(e.name) === normName(business.name));
+    if (ents.length && !ents.some((e) => e.sameAs.length)) add('ai-entity-links-missing', home.file, 'Add "sameAs" links to your Google Business Profile, Facebook, LinkedIn and Yelp pages in the business schema.');
+  }
+
   const off = cfg.rules || {};
   return {
     business, siteOrigin,
@@ -216,4 +254,4 @@ function run(site, cfg = {}) {
   };
 }
 
-module.exports = { run, RULES };
+module.exports = { run, RULES, robotsBlocksRoot, AI_SEARCH_BOTS };
