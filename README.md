@@ -1,5 +1,5 @@
 # local-seo-lint
-
+[![npm](https://img.shields.io/npm/v/local-seo-lint)](https://www.npmjs.com/package/local-seo-lint) [![tests](https://github.com/clicksdynastyincali/local-seo-lint/actions/workflows/test.yml/badge.svg)](https://github.com/clicksdynastyincali/local-seo-lint/actions) [![Try it in your browser](https://img.shields.io/badge/try%20it-in%20your%20browser-EAB308)](https://www.clicksdynasty.com/local-seo-checker.html)
 **Catch local SEO and AI-search mistakes before they go live.**
 
 `local-seo-lint` scans a static website folder and flags the problems that quietly hurt local rankings: a phone number that's different on one page, schema that disagrees with the page, two pages fighting for the same search, pages Google can't find, and more.
@@ -24,7 +24,7 @@ We built this at [Clicks Dynasty](https://www.clicksdynasty.com), a local SEO ag
 
 ```bash
 # Run straight from GitHub, no install
-npx github:clicksdynastyincali/local-seo-lint ./my-site
+npx local-seo-lint ./my-site
 
 # Or clone and run
 git clone https://github.com/clicksdynastyincali/local-seo-lint.git
@@ -217,7 +217,13 @@ More customers now ask ChatGPT and Perplexity to recommend local businesses. In 
 - International phone formats
 
 Issues and pull requests are welcome.
+## Show that your site passes
 
+Add this badge to your project's README:
+
+```markdown
+[![Checked with local-seo-lint](https://img.shields.io/badge/local%20SEO-checked-3A6B35)](https://www.clicksdynasty.com/local-seo-checker.html)
+```
 ## For agencies
 
 Running this on client sites and finding more than your team has time to fix? [Clicks Dynasty](https://www.clicksdynasty.com) fixes local SEO and AI-visibility issues white-label, under your brand, and never contacts your clients. [Book a free call](https://www.clicksdynasty.com/book.html?service=strategy).
