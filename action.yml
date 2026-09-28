@@ -1,5 +1,5 @@
 name: 'Local SEO Lint'
-description: 'Catch local SEO mistakes in static sites: NAP consistency, schema vs. page, canonicals, sitemap, orphan pages and keyword overlap.'
+description: 'Catch local SEO and AI-search mistakes: blocked AI crawlers, NAP mismatches, schema, canonicals and sitemaps.'
 author: 'Clicks Dynasty'
 branding:
   icon: 'map-pin'
